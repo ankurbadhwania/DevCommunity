@@ -1,34 +1,34 @@
 const express = require("express")
+const connectDB = require("./config/database");
+const User = require("./models/user")
 const app = express();   // creating application
-const {adminAuth, userAuth} = require("./middlewares/auth")
 
-app.use("/admin", adminAuth);    // run for all type of req on admin 
-// app.use("/user", userAuth);
 
-app.get("/user/login", (req, res) => {
-    console.log("login page open");
-    res.send("you are on login page");
+app.post("/signup", async (req, res) => {
+    const user =  new User({
+        firstName  : "ankur",
+        lastName : "yadav",
+        email : "abc@gmail.com",
+        password : "127a3"
+    })
+    // const user = new User(userObj);
+    try{
+        await user.save();
+    res.send("new user added");
+    }
+    catch(err){
+        res.status(400).send("error user not saved: " + err.message);
+    }
+    
 })
 
-app.get("/admin", (req, res) => {
-    console.log("admin data fetched");
-    res.send("admin successfully logged in");
-})
-
-app.get("/admin/delete", (req, res) => {
-    console.log("deleting");
-    res.send("admin deleted logged in");
-})
-
-
-app.get("/user/data", userAuth, (req, res) => {
-    console.log("user data fetched");
-    res.send("user successfully logged in");
-})
-
-
-const port = 3000;
-app.listen(port, ()=>{
-    console.log(`server started, listening to port ${port}`)
+connectDB().then(()=> {
+    const port = 3000;
+    console.log("database connected");
+    app.listen(port, ()=>{
+        console.log(`server started, listening to port ${port}`)
+    })
+}).catch((err) =>{
+    console.error("database connection error")
 })
  
