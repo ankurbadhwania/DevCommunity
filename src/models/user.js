@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const validator = require('validator');   // library to check email structure/strong password/url etc
+
 const userSchema = new mongoose.Schema({
     firstName : {
         type  : String,
@@ -15,10 +17,20 @@ const userSchema = new mongoose.Schema({
         lowercase : true,
         trim : true,
         unique : true,
+        validate(value){
+            if(!validator.isEmail(value)){
+                throw new Error("invalid email address");
+            }
+        }
     },
     password : {
         type  : String,
         required : true,
+        validate(value){
+            if(!validator.isStrongPassword(value)){
+                throw new Error("password is weak");
+            }
+        }
     },
     age : {
         type  : Number,
@@ -37,6 +49,11 @@ const userSchema = new mongoose.Schema({
     photoUrl : {
         type  : String,
         default : "https://geographyandyou.com/images/user-profile.png",
+        validate(value){
+            if(!validator.isURL(value)){
+                throw new Error("invalid photo url");
+            }
+        }
     },
     skills : {
         type : [String],
