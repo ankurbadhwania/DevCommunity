@@ -1,12 +1,27 @@
 const express = require("express")
 const connectDB = require("./config/database");
 const User = require("./models/user")
+const bcrypt = require("bcrypt")
+const cookieParser = require("cookie-parser")
+const {validateSignUp} = require("./utils/validation")
+
 const app = express();   // creating application
 app.use(express.json())  // converts json from api req to js object
+app.use(cookieParser())    // middleware to read cookies
 
 app.post("/signup", async (req, res) => {
-    const user = new User(req.body);
     try{
+        validateSignUp(req);
+        const {firstName, lastName, email, password} = req.body;        
+        const passwordHash = await bcrypt.hash(password, 10);
+        // const user = new User(req.body);
+        const user = new User({
+            firstName,
+            lastName,
+            email,
+            password : passwordHash,
+        });
+
         await user.save();
         res.send("new user added");
     }
@@ -14,6 +29,30 @@ app.post("/signup", async (req, res) => {
         res.status(400).send("error user not saved: " + err.message);
     }
     
+})
+
+//login route
+app.post("/login", async (req, res) => {
+    try{
+        const {email, password} = req.body;
+        const user = await User.findOne({email});
+
+        if(!user){
+            throw new Error("invalid credentials");
+        }
+        const checkPassword = await bcrypt.compare(password, user.password);
+
+        if(checkPassword){
+            res.send("login successfull");
+        }
+        else{
+            throw new Error("invalid credentials");
+        }
+    }
+    catch(err){
+        res.status(400).send("login error occurred: " + err.message)
+    }
+
 })
 
 // get a user details
