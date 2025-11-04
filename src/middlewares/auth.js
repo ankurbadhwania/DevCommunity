@@ -1,16 +1,22 @@
-const adminAuth = (req, res, next) => {
-    const adminToken = "xyz";
-    if(adminToken !== "xyz"){
-        res.status(401).send("invalid user")
+const jwt = require("jsonwebtoken")
+const User = require('../models/user');
+const userAuth = async (req, res, next) => {
+    try{
+        const {token} = req.cookies;
+        if(!token){
+            throw new Error("invalid token");
+        }
+        const decodedMessage = await jwt.verify(token, "DevCommunity$123");
+        const {_id} = decodedMessage;
+        const user = await User.findById(_id);
+        if(!user){
+            throw new Error("user not found");
+        }
+        req.user = user;
+        next();
     }
-    next();
-}
-
-const userAuth = (req, res, next) => {
-    const userToken = "abc";
-    if(userToken !== "abc"){
-        res.status(401).send("invalid user")
+    catch(err){
+        res.status(400).send("Error" + err.message);
     }
-    next();
 }
-module.exports = {adminAuth, userAuth};
+module.exports = userAuth;
