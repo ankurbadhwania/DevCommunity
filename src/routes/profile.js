@@ -1,7 +1,11 @@
 const express = require('express')
 const profileRouter = express.Router();
 const userAuth = require("../middlewares/auth")
-const {validateEditProfileData} = require("../utils/validation")
+const {validateEditProfileData, isStrongPassword} = require("../utils/validation");
+const User = require('../models/user');
+const bcrypt = require("bcrypt");
+
+
 // login profile
 profileRouter.get("/profile", userAuth, async (req, res) => {
     try {
@@ -13,6 +17,7 @@ profileRouter.get("/profile", userAuth, async (req, res) => {
     }
 })
 
+//edit
 profileRouter.patch("/profile/edit", userAuth, async (req, res) =>{
     const loggedInUser = req.user;
     try {
@@ -25,6 +30,25 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) =>{
             message : `${loggedInUser.firstName}, your profile updated successfully`,
             data : loggedInUser
         })
+    }
+    catch(err){
+        res.status(400).send(err.message);
+    }
+})
+
+//forgot password
+profileRouter.patch("/profile/forgotpassword", async (req, res) => {
+    try{
+        const {email, password} = req.body;
+        const user = await User.findOne({email});
+        if(user){
+            if(isStrongPassword(password)) user.password = await bcrypt.hash(password, 10);
+        }
+        else{
+            throw new Error("incorrect email address");
+        }
+        await user.save();
+        res.send("password updated successfully");
     }
     catch(err){
         res.status(400).send(err.message);
