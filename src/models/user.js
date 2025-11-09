@@ -50,7 +50,8 @@ const userSchema = new mongoose.Schema({
     },
     photoUrl : {
         type  : String,
-        default : "https://geographyandyou.com/images/user-profile.png",
+        // default : "https://geographyandyou.com/images/user-profile.png",
+        default : "https://img.freepik.com/premium-vector/flat-vector…ator_1033579-56435.jpg?semt=ais_hybrid&w=740&q=80",
         validate(value){
             if(!validator.isURL(value)){
                 throw new Error("invalid photo url");
