@@ -24,7 +24,7 @@ userRouter.get("/request/received", userAuth, async (req, res) => {
 })
 
 //get all accepted requests or user connections
-userRouter.get("/request/connection", userAuth, async (req, res) =>{
+userRouter.get("/user/connection", userAuth, async (req, res) =>{
     try{
         const loggedInUser = req.user;
         const connections = await ConnectionRequest.find({
@@ -69,13 +69,13 @@ userRouter.get("/feed", userAuth, async (req, res) => {
             hideUserFromFeed.add(conn.fromUserId.toString());
             hideUserFromFeed.add(conn.toUserId.toString());
         })
-        const usersToShow = await User.find({
+        const users = await User.find({
             $and : [
                 {_id : { $nin : Array.from(hideUserFromFeed)}},
                 {_id : { $ne : loggedInUser._id}}
             ]
         }).select("firstName lastName skills about photoUrl").skip(skip).limit(limit);
-        res.json({usersToShow})
+        res.json({data : users})
     }
     catch(err){
         res.status(400).send(err.message);

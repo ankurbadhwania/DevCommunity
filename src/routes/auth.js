@@ -34,7 +34,7 @@ authRouter.post("/login", async (req, res) => {
         const user = await User.findOne({email});
 
         if(!user){
-            throw new Error("invalid credentials");
+            res.status(400).send("invalid credentials");
         }
         // const isPasswordValid = await bcrypt.compare(password, user.password);
         const isPasswordValid = await user.ValidatePassword(password);
@@ -46,11 +46,11 @@ authRouter.post("/login", async (req, res) => {
             res.send(user);
         }
         else{
-            throw new Error("invalid credentials");
+            res.status(400).send("invalid credentials");
         }
     }
     catch(err){
-        res.status(400).send("login error occurred: " + err.message)
+        res.status(400).send("Error: " + err.message)
     }
 
 })

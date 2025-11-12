@@ -4,13 +4,13 @@ const userAuth = async (req, res, next) => {
     try{
         const {token} = req.cookies;
         if(!token){
-            res.status(401).send("Login first!");
+            return res.status(401).send("user not found");
         }
         const decodedMessage = await jwt.verify(token, "DevCommunity$123");
         const {_id} = decodedMessage;
         const user = await User.findById(_id);
         if(!user){
-            throw new Error("user not found");
+            return res.status(401).send("invalid credentials");
         }
         req.user = user;
         next();

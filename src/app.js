@@ -3,7 +3,7 @@ const connectDB = require("./config/database");
 const cookieParser = require("cookie-parser")
 const cors = require("cors")
 const app = express();   // creating application
-   // middleware to read cookies
+   
 
 const authRouter = require('./routes/auth')
 const profileRouter = require('./routes/profile')
@@ -15,7 +15,7 @@ app.use(cors( {
     credentials : true
 }));
 app.use(express.json())  // converts json from api req to js object
-app.use(cookieParser()) 
+app.use(cookieParser())  // middleware to read cookies
 
 app.use("/",authRouter);
 app.use("/",profileRouter);
