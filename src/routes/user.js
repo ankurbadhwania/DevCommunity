@@ -15,7 +15,7 @@ userRouter.get("/request/received", userAuth, async (req, res) => {
         
         res.json({
             message : "data fetched successfully",
-            requests : connectionRequests
+            data : connectionRequests
         })
     }
     catch(err){
